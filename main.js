@@ -3,7 +3,9 @@ try {
 	require('electron-reloader')(module);
 } catch (_) {}
 
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, globalShortcut} = require('electron')
+
+let isOpen = true;
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -30,3 +32,19 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+app.on('ready', () => {
+  globalShortcut.register('Ctrl+Shift+Alt+D', () => {
+    console.log("press")
+    if (BrowserWindow.getAllWindows().length === 0) {
+      console.log("no windows, create one");
+      createWindow()
+    }else{
+      console.log("active existed window");
+      BrowserWindow.getAllWindows().forEach(win => {
+        win.show();
+      });
+    }
+  });
+
+});
