@@ -10,8 +10,8 @@ const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('elec
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 500,
+    height: 100,
     webPreferences: {
       nodeIntegration: true
     }
@@ -54,6 +54,22 @@ function closeWindow(){
 ipcMain.on("close-window", e => {
   console.log("ipc close window");
   closeWindow();
+});
+
+ipcMain.handle("cal", async (e, a) => {
+  console.log("cal:", e, a);
+  //try to calculate
+  try{
+    const result = eval(a);
+    const calResult = parseFloat(result);
+    if(calResult){
+      console.log("cal:", calResult);
+      return calResult
+    }
+  }catch(e){
+    console.log("fail:", e);
+  }
+  return;
 });
 
 app.whenReady().then(createWindow)
@@ -101,3 +117,5 @@ app.on('ready', () => {
 app.on('window-all-closed', () => {
   if (appIcon) appIcon.destroy()
 })
+
+console.log(eval("1+1"))

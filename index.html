@@ -7,12 +7,14 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
 </head>
 <body style="background: white;">
-    <h1>Dadiorapp</h1>
-    <input id="input" atuofocus style="font-size: 35px;" />
+    <input id="input" atuofocus style="font-size: 25px;" />
+    <span style="margin-top: 5px; font-size:25px" id="output" >
+    </span>
 </body>
   <script src="./renderer.js"></script>
   <script>
     var input = document.getElementById("input");
+    var output = document.getElementById("output");
 input.addEventListener("keyup", function(e){
   console.log("handle...", e);
   if(e.key === "Enter"){
@@ -23,6 +25,15 @@ input.addEventListener("keyup", function(e){
       console.log("launch longman", match[1]);
       launchLongman(match[1]);
     }
+  }else{
+    cal(input.value)
+      .then(r => {
+        if(r){
+          output.innerHTML = r;
+        }else{
+          output.innerHTML = '';
+        }
+      });
   }
 });
 
