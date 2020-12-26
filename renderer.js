@@ -9,3 +9,7 @@ function launchLongman(keyword){
   }, 500);
 }
 
+function cal(text){
+  return ipc.invoke("cal", text);
+}
+
