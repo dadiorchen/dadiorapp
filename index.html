@@ -7,11 +7,23 @@
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
 </head>
 <body style="background: white;">
-    <h1>Dadiorapp!!!!</h1>
-    <p>
-        We are using node <script>document.write(process.versions.node)</script>,
-        Chrome <script>document.write(process.versions.chrome)</script>,
-        and Electron <script>document.write(process.versions.electron)</script>.
-    </p>
+    <h1>Dadiorapp</h1>
+    <input id="input" style="font-size: 35px;" />
 </body>
+  <script src="./renderer.js"></script>
+  <script>
+    var input = document.getElementById("input");
+input.addEventListener("keyup", function(e){
+  console.log("handle...", e);
+  if(e.key === "Enter"){
+    console.log("enter");
+    var value = input.value;
+    var match
+    if(value && (match = value.match(/l\s+(.*)/))){
+      console.log("launch longman", match[1]);
+      launchLongman(match[1]);
+    }
+  }
+});
+  </script>
 </html>

@@ -5,7 +5,7 @@ try {
 	require('electron-reloader')(module);
 } catch (_) {}
 
-const { app, BrowserWindow, globalShortcut, Menu, Tray} = require('electron')
+const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('electron')
 
 
 function createWindow () {
@@ -31,6 +31,21 @@ function activeApp(){
     });
   }
 }
+
+function closeWindow(){
+  if (BrowserWindow.getAllWindows().length === 0) {
+    console.log("no windows");
+  }else{
+    BrowserWindow.getAllWindows().forEach(win => {
+      win.close();
+    });
+  }
+}
+
+ipcMain.on("close-window", e => {
+  console.log("ipc close window");
+  closeWindow();
+});
 
 app.whenReady().then(createWindow)
 
