@@ -25,7 +25,7 @@ function createWindow () {
 //    }, 300);
 //  });
 
-  win.loadFile('index.html')
+  win.loadFile('build/index.html')
 
 }
 
