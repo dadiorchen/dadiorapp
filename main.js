@@ -17,7 +17,16 @@ function createWindow () {
     }
   })
 
+//  win.on('show', () => {
+//    console.log("on show");
+//    setTimeout(() => {
+//      console.log("win focus");
+//      win.focus();
+//    }, 300);
+//  });
+
   win.loadFile('index.html')
+
 }
 
 function activeApp(){
