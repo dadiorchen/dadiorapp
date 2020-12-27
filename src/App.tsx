@@ -5,7 +5,6 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import { makeStyles } from '@material-ui/core/styles';
-import Icon from "./iconTemplate.png";
 import Calculator from "./AppIcon_128x128x32.png";
 import Longman from "./longman.png";
 import Box from "@material-ui/core/Box";
@@ -107,13 +106,20 @@ const {shell} = window.require("electron");
 function launchLongman(keyword: any){
   console.log("lanch Longman");
   shell.openExternal(`https://www.ldoceonline.com/dictionary/${keyword}`)
-  setTimeout(() => {
-    ipc.send("close-window");
-  }, 500);
+    .then(() => {
+      console.log("shell opened");
+      setTimeout(() => {
+        ipc.send("close-window");
+      }, 500);
+    });
 }
 
 function cal(text: any){
   return ipc.invoke("cal", text);
+}
+
+function close(){
+  return ipc.send("close-window");
 }
 
 function App() {
@@ -130,6 +136,16 @@ function App() {
         if(input && (match = input.match(/l\s+(.*)/))){
           console.log("launch longman", match[1]);
           launchLongman(match[1]);
+        }
+      }else if(e.key === "Escape"){
+        console.log("escape");
+        if(input !== ""){
+          console.log("clean");
+          setInput("");
+          setOutput("");
+        }else{
+          console.log("close");
+          close();
         }
       }
   }

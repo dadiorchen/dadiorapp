@@ -24,6 +24,8 @@ function createWindow () {
     frame: false,
   })
 
+  console.log("created window:", win.id);
+
 //  win.on('show', () => {
 //    console.log("on show");
 //    setTimeout(() => {
@@ -51,6 +53,7 @@ function activeApp(){
   }else{
     console.log("active existed window");
     BrowserWindow.getAllWindows().forEach(win => {
+      console.log("show window:", win.id);
       win.show();
     });
   }
@@ -61,8 +64,8 @@ function closeWindow(){
     console.log("no windows");
   }else{
     BrowserWindow.getAllWindows().forEach(win => {
-      console.log("close window");
-      win.close();
+      console.log("close window:", win.id);
+      win.hide();
     });
   }
 }
@@ -98,10 +101,12 @@ app.whenReady().then(() => {
 //    app.quit()
 //  }
 //})
+//
 
 app.on('activate', () => {
   console.log("on active");
   if (BrowserWindow.getAllWindows().length === 0) {
+    console.log("create in active");
     createWindow()
   }
 })
