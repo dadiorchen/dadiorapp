@@ -7,7 +7,9 @@ try {
 
 const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('electron')
 
-const ENV = "dev";
+console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+
+const ENV = process.env.NODE_ENV || "prod";
 
 console.log("init app with env:", ENV);
 
