@@ -7,8 +7,14 @@ try {
 
 const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('electron')
 
+const ENV = "dev";
+
+console.log("init app with env:", ENV);
+
+
 
 function createWindow () {
+  console.log("create win");
   const win = new BrowserWindow({
     width: 682,
     height: 432,
@@ -26,10 +32,15 @@ function createWindow () {
 //    }, 300);
 //  });
 
-  //for prod
-  win.loadFile('build/index.html')
-  //for dev
-//  win.loadURL('http://localhost:3000/');
+  if(ENV === "dev"){
+    //for dev
+    win.loadURL('http://localhost:3000/');
+  }else if(ENV === "prod" || ENV === "production"){
+    //for prod
+    win.loadFile('build/index.html')
+  }else{
+    throw new Error("wrong env");
+  }
 
 }
 
@@ -50,6 +61,7 @@ function closeWindow(){
     console.log("no windows");
   }else{
     BrowserWindow.getAllWindows().forEach(win => {
+      console.log("close window");
       win.close();
     });
   }
@@ -76,21 +88,26 @@ ipcMain.handle("cal", async (e, a) => {
   return;
 });
 
-app.whenReady().then(createWindow)
-
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+app.whenReady().then(() => {
+  console.log("ready");
+  createWindow();
 })
 
+//app.on('window-all-closed', () => {
+//  if (process.platform !== 'darwin') {
+//    app.quit()
+//  }
+//})
+
 app.on('activate', () => {
+  console.log("on active");
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 })
 
 app.on('ready', () => {
+  console.log("on ready");
   
   //shortcut
   globalShortcut.register('Ctrl+Shift+Alt+D', () => {
@@ -118,8 +135,7 @@ app.on('ready', () => {
 
 });
 
-app.on('window-all-closed', () => {
-  if (appIcon) appIcon.destroy()
-})
+//app.on('window-all-closed', () => {
+//  if (appIcon) appIcon.destroy()
+//})
 
-console.log(eval("1+1"))
