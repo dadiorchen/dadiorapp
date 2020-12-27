@@ -19,7 +19,7 @@ if(!window.require){
       ipcRenderer: {
         invoke: () => {
           console.log("mock invoke");
-          return Promise.resolve(false);
+          return Promise.resolve(1);
         }
       }
     };
@@ -68,10 +68,12 @@ const useStyles = makeStyles({
     background: GRAY_COLOR_2,
   },
   box2: {
+    flexGrow: 1,
   },
   box3: {
     flexWrap: "nowrap",
     flexDirection: "row",
+    height: "100%",
   },
   box4: {
   },

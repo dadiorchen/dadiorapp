@@ -26,8 +26,10 @@ function createWindow () {
 //    }, 300);
 //  });
 
-//  win.loadFile('build/index.html')
-  win.loadURL('http://localhost:3000/');
+  //for prod
+  win.loadFile('build/index.html')
+  //for dev
+//  win.loadURL('http://localhost:3000/');
 
 }
 
