@@ -10,11 +10,12 @@ const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('elec
 
 function createWindow () {
   const win = new BrowserWindow({
-    width: 500,
-    height: 100,
+    width: 682,
+    height: 432,
     webPreferences: {
       nodeIntegration: true
-    }
+    },
+    frame: false,
   })
 
 //  win.on('show', () => {

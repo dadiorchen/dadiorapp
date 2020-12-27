@@ -34,6 +34,7 @@ const GRAY_COLOR_2 = "#a5a39e"
 const useStyles = makeStyles({
   root: {
     background: BACKGROUND_COLOR,
+    height: "100vh",
   },
   headBox:{
     justifyContent: "space-between",
@@ -71,7 +72,6 @@ const useStyles = makeStyles({
   box3: {
     flexWrap: "nowrap",
     flexDirection: "row",
-    minHeight: 500,
   },
   box4: {
   },
