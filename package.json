@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "electron-forge start",
+    "start": "NODE_ENV=dev electron-forge start",
+    "build": "react-scripts build && electron-forge make",
     "dev": "electron-forge . --debug",
     "package": "electron-forge package",
     "make": "electron-forge make",
