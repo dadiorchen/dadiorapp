@@ -37,6 +37,8 @@
     "web-vitals": "^0.2.4"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
     "electron-squirrel-startup": "^1.0.0"
   },
   "eslintConfig": {
