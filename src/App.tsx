@@ -7,9 +7,24 @@ import Avatar from "@material-ui/core/Avatar";
 import { makeStyles } from '@material-ui/core/styles';
 import Icon from "./iconTemplate.png";
 import Calculator from "./AppIcon_128x128x32.png";
+import Longman from "./longman.png";
 import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
 
+//dev
+if(!window.require){
+  //@ts-ignore
+  window.require= function(){
+    return {
+      ipcRenderer: {
+        invoke: () => {
+          console.log("mock invoke");
+          return Promise.resolve(false);
+        }
+      }
+    };
+  }
+}
 
 const HEIGHT = 56;
 const BACKGROUND_COLOR = "#5B5B5B"
@@ -84,23 +99,6 @@ const useStyles = makeStyles({
   },
 });
 
-
-
-//dev
-if(!window.require){
-  //@ts-ignore
-  window.require= function(){
-    return {
-      ipcRenderer: {
-        invoke: () => {
-          console.log("mock invoke");
-          return Promise.resolve(100);
-        }
-      }
-    };
-  }
-}
-
 const ipc = window.require("electron").ipcRenderer;
 const {shell} = window.require("electron");
 
@@ -144,8 +142,14 @@ function App() {
           setOutput(r + "");
           setMode("calculator");
         }else{
-          setOutput('');
-          setMode("");
+          var match;
+          if(input && (match = input.match(/l\s+(.*)/))){
+            setOutput('');
+            setMode("longman");
+          }else{
+            setOutput('');
+            setMode("");
+          }
         }
       });
   }
@@ -193,7 +197,10 @@ function App() {
               <Box/>
             }
             {mode === "calculator" &&
-              <Avatar variant="square" src={Calculator} />
+              <Avatar variant="rounded" src={Calculator} />
+            }
+            {mode === "longman" &&
+              <Avatar variant="rounded" src={Longman} />
             }
           </Grid>
         </Grid>
