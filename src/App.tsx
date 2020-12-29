@@ -9,6 +9,7 @@ import Calculator from "./AppIcon_128x128x32.png";
 import Longman from "./longman.png";
 import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
+import Icon from "/Applications/Be Focused.app/Contents/Resources/AppIconlite.icns";
 
 //dev
 if(!window.require){
