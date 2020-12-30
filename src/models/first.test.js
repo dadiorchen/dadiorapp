@@ -90,6 +90,13 @@ describe("test", () => {
 //      expectRuntime(lunr).defined();
 //      expectRuntime(lunr).property("zh").defined();
 //      global.lunr = lunr;
+        var lunr = require('../../node_modules/pouchdb-quick-search/node_modules/lunr');
+        require('../../../test/lunr-languages/lunr.stemmer.support.js')(lunr);
+        require('../../../test/lunr-languages/lunr.fr')(lunr);
+        //require('lunr-languages/lunr.multi.js')(lunr);
+        require('../../../test/lunr-languages/lunr.zh.js')(lunr);
+        global.lunr = lunr;
+
 
       const apps = app.getAppInfoList();
       const appDocs = apps.map((a,i) => {
