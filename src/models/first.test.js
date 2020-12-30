@@ -82,14 +82,14 @@ describe("test", () => {
     });
 
     it("index, search", async () => {
-      var lunr = require('lunr');
-      require('lunr-languages/lunr.stemmer.support.js')(lunr);
-      require('lunr-languages/lunr.fr')(lunr);
-      require('lunr-languages/lunr.multi.js')(lunr);
-      require('../../../test/lunr-languages/lunr.zh.js')(lunr);
-      expectRuntime(lunr).defined();
-      expectRuntime(lunr).property("multiLanguage").defined();
-      global.lunr = lunr;
+//      var lunr = require('../../node_modules/pouchdb-quick-search/node_modules/lunr');
+//      require('lunr-languages/lunr.stemmer.support.js')(lunr);
+//      require('lunr-languages/lunr.fr')(lunr);
+//      //require('lunr-languages/lunr.multi.js')(lunr);
+//      require('../../../test/lunr-languages/lunr.zh.js')(lunr);
+//      expectRuntime(lunr).defined();
+//      expectRuntime(lunr).property("zh").defined();
+//      global.lunr = lunr;
 
       const apps = app.getAppInfoList();
       const appDocs = apps.map((a,i) => {
@@ -110,7 +110,7 @@ describe("test", () => {
         include_docs: true,
         language: 'zh',
       });
-      log.warn("result:", result);
+      log.warn("result:%o", result);
       expectRuntime(result).property("rows").lengthOf.above(0);
     });
   });

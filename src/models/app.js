@@ -15,7 +15,7 @@ module.exports = {
         exe: plistObject.CFBundleExecutable,
       }
     }catch(e){
-      log.error("parse plist fail:", e);
+      log.log("parse plist fail:", e);
       throw 500;
     }
   },
