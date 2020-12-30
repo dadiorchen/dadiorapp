@@ -68,28 +68,51 @@ describe("test", () => {
     expect(found.length).toBeGreaterThan(0);
   });
 
-  it.only("pounchDB", async () => {
+  describe.only("PounchDB", () => {
     var PouchDB = require("pouchdb");
     PouchDB.plugin(require('pouchdb-quick-search'));
-    const apps = app.getAppInfoList();
-    const appDocs = apps.map((a,i) => {
-      return {
-        _id: i + "",
-        ...a
-      }
+    let db;
+
+    beforeAll(async () => {
+      db = new PouchDB("localtest.pdb");
     });
-    var db = new PouchDB("localtest.pdb");
-    appDocs.forEach(async doc => {
-    log.debug("doc:", doc);
-      await db.put(doc);
+
+    afterAll(async () => {
+      await db.destroy();
     });
-    const result = await db.search({
-      query: "WeChat",
-      fields: {
-        'name': 1,
-      },
+
+    it("index, search", async () => {
+      var lunr = require('lunr');
+      require('lunr-languages/lunr.stemmer.support.js')(lunr);
+      require('lunr-languages/lunr.fr')(lunr);
+      require('lunr-languages/lunr.multi.js')(lunr);
+      require('../../../test/lunr-languages/lunr.zh.js')(lunr);
+      expectRuntime(lunr).defined();
+      expectRuntime(lunr).property("multiLanguage").defined();
+      global.lunr = lunr;
+
+      const apps = app.getAppInfoList();
+      const appDocs = apps.map((a,i) => {
+        return {
+          _id: i + "",
+          ...a
+        }
+      });
+      appDocs.forEach(async doc => {
+      log.debug("doc:", doc);
+        await db.put(doc);
+      });
+      const result = await db.search({
+        query: "网",
+        fields: {
+          'name': 1,
+        },
+        include_docs: true,
+        language: 'zh',
+      });
+      log.warn("result:", result);
+      expectRuntime(result).property("rows").lengthOf.above(0);
     });
-    log.warn("result:", result);
   });
 
   it("lunr chinese", () => {
