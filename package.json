@@ -42,6 +42,8 @@
     "@material-ui/icons": "^4.11.2",
     "electron-squirrel-startup": "^1.0.0",
     "expect-runtime": "^0.7.0",
+    "iconutil": "^1.0.2",
+    "loglevel": "^1.7.1",
     "lunr": "^2.3.9",
     "plist": "^3.0.1",
     "shelljs": "^0.8.4"

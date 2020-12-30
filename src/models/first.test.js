@@ -3,6 +3,7 @@
  */
 const app = require("./app");
 const expectRuntime = require("expect-runtime");
+const fs = require("fs");
 
 describe("test", () => {
 
@@ -69,6 +70,31 @@ describe("test", () => {
   it.only("lunr chinese", () => {
     const found = app.search("网");
     expect(found.length).toBeGreaterThan(0);
+  });
+
+
+  it("icon", async () => {
+    var iconutil = require('iconutil');
+
+    var path = "/Applications/Be Focused.app/Contents/Resources/AppIconlite.icns";
+
+    const bufferMap = await (new Promise((res, rej) => {
+      iconutil.toIconset(path, function(err, icons) {
+        // icons is an an object where keys are the file names
+        // and the values are Buffers containing PNG files
+        console.log("err:", err);
+        console.log("icons:", icons);
+        res(icons);
+      });
+    }));
+    expectRuntime(bufferMap).defined();
+    const buffers =  Object.values(bufferMap);
+    const buffer = buffers.pop();
+    var string = buffer.toString('base64');
+    var dataURL = "data:image/png;base64," + string
+    console.log(dataURL.slice(0, 200));
+    fs.writeFileSync("/Users/deanchen/work/temp/test.png", dataURL);
+
   });
 
 });
