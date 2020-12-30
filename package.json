@@ -46,6 +46,8 @@
     "loglevel": "^1.7.1",
     "lunr": "^2.3.9",
     "plist": "^3.0.1",
+    "pouchdb": "^7.2.2",
+    "pouchdb-quick-search": "^1.3.0",
     "shelljs": "^0.8.4"
   },
   "eslintConfig": {

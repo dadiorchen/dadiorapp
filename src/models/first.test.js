@@ -4,6 +4,7 @@
 const app = require("./app");
 const expectRuntime = require("expect-runtime");
 const fs = require("fs");
+const log = require("loglevel");
 
 describe("test", () => {
 
@@ -67,10 +68,35 @@ describe("test", () => {
     expect(found.length).toBeGreaterThan(0);
   });
 
-  it.only("lunr chinese", () => {
+  it.only("pounchDB", async () => {
+    var PouchDB = require("pouchdb");
+    PouchDB.plugin(require('pouchdb-quick-search'));
+    const apps = app.getAppInfoList();
+    const appDocs = apps.map((a,i) => {
+      return {
+        _id: i + "",
+        ...a
+      }
+    });
+    var db = new PouchDB("localtest.pdb");
+    appDocs.forEach(async doc => {
+    log.debug("doc:", doc);
+      await db.put(doc);
+    });
+    const result = await db.search({
+      query: "WeChat",
+      fields: {
+        'name': 1,
+      },
+    });
+    log.warn("result:", result);
+  });
+
+  it("lunr chinese", () => {
     const found = app.search("网");
     expect(found.length).toBeGreaterThan(0);
   });
+
 
 
   it("icon", async () => {
