@@ -7,7 +7,7 @@ const expectR = expectRuntime;
 const fs = require("fs");
 const log = require("loglevel");
 const du = require('du')
-log.setLevel("info");
+log.setLevel("debug");
 
 describe("test", () => {
 
@@ -66,7 +66,7 @@ describe("test", () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
-  describe.only("search", () => {
+  describe("search", () => {
 
     beforeEach(async () => {
       await app.init();
@@ -91,11 +91,6 @@ describe("test", () => {
 
   });
 
-
-  it("search Chinese", () => {
-    const found = app.search("网易");
-    expectR(found).lengthOf.least(1);
-  });
 
   describe.skip("PounchDB", () => {
     var PouchDB = require("pouchdb");
@@ -307,6 +302,13 @@ describe("test", () => {
     console.log(dataURL.slice(0, 200));
     fs.writeFileSync("/Users/deanchen/work/temp/test.png", dataURL);
 
+  });
+
+
+  it.only("open app", async () => {
+    const shell = require("shelljs");
+    const r = await shell.exec("open -a 网易有道词典");
+    log.debug("shell:", r);
   });
 
 });
