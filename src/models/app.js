@@ -1,6 +1,12 @@
 const fs = require("fs");
 const expectRuntime = require("expect-runtime");
+const expectR = expectRuntime;
 const log = require("loglevel");
+const DB_NAME = "dadiorapp.db";
+//init DB
+var PouchDB = require("pouchdb");
+PouchDB.plugin(require('pouchdb-quick-search'));
+const isChineseEnabled = true
 
 module.exports = {
   getAppInfo: function(plistFile){
@@ -51,7 +57,56 @@ module.exports = {
     log.log("sucessed %d, total: %d", counter, dirs.length);
     return result;
   },
-  search: function(keyword){
+  init: async function(){
+    //DB
+    let db = new PouchDB(DB_NAME);
+    //clean
+    await db.destroy();
+    db = new PouchDB(DB_NAME);
+    if(isChineseEnabled){
+      log.warn("load chinese index");
+      const lunr = require('../../node_modules/pouchdb-quick-search/node_modules/lunr');
+      require('../../node_modules/lunr-languages/lunr.stemmer.support.js')(lunr);
+      require('../../node_modules/lunr-languages/lunr.zh')(lunr);
+      //@ts-ignore
+      global.lunr = lunr;
+    }
+
+    const apps = this.getAppInfoList();
+    const appDocs = apps.map((a,i) => {
+      return {
+        _id: i + "",
+        ...a
+      }
+    });
+    appDocs.forEach(async doc => {
+    log.debug("doc:", doc);
+      await db.put(doc);
+    });
+    const result = await db.search({
+      query: "网",
+      fields: {
+        'name': 1,
+      },
+      include_docs: true,
+      language: isChineseEnabled? 'zh' : undefined,
+    });
+    log.warn("result:%o", result);
+    //expectRuntime(result).property("rows").lengthOf.least(1);
+  },
+  search: async function(keyword){
+    let db = new PouchDB(DB_NAME);
+    const result = await db.search({
+      query: "网",
+      fields: {
+        'name': 1,
+      },
+      include_docs: true,
+      language: isChineseEnabled? 'zh' : undefined,
+    });
+    return result.rows.map(i => i.doc);
+  },
+  searchDeprecated: function(keyword){
     const lunr = require("lunr");
     const language = "zh";
     require('../../../test/lunr-languages/lunr.stemmer.support.js')(lunr);
