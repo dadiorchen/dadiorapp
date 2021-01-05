@@ -2,3 +2,6 @@ out
 node_modules
 build
 .eslintcache
+localtest*
+data.pdb*
+dadiorapp.db*
