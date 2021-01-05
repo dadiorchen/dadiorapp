@@ -3,6 +3,10 @@ const api = require("./src/models/api");
 const log = require("loglevel");
 const appModel = require("./src/models/app");
 
+log.info("update app...");
+const r = require('update-electron-app')()
+log.debug("retrun from updater:", r);
+
 //auto reload
 try {
 	require('electron-reloader')(module);
