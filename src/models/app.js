@@ -1,6 +1,6 @@
 const fs = require("fs");
 const expectRuntime = require("expect-runtime");
-const expectR = expectRuntime;
+const expect = expectRuntime;
 const log = require("loglevel");
 const DB_NAME = "dadiorapp.db";
 //init DB
@@ -35,11 +35,11 @@ module.exports = {
       if(dir.match("^.*\.app$")){
         const path = `${pathAppDir}/${dir}/Contents/Info.plist`;
         log.log("path of app:", path);
-        expect(fs.existsSync(path)).toBe(true);
+        expect(fs.existsSync(path)).eq(true);
         try{
           const one = this.getAppInfo(path);
-          expect(one.name).toBeDefined();
-          expect(one.exe).toBeDefined();
+          expect(one.name).defined();
+          expect(one.exe).defined();
           log.log(`open -a "${result.exe}"`);
           counter++;
           result.push(one);
@@ -60,14 +60,16 @@ module.exports = {
   init: async function(){
     //DB
     let db = new PouchDB(DB_NAME);
+    log.info("init db, reset the db...");
     //clean
     await db.destroy();
     db = new PouchDB(DB_NAME);
+    log.info("new one");
     if(isChineseEnabled){
       log.warn("load chinese index");
       const lunr = require('../../node_modules/pouchdb-quick-search/node_modules/lunr');
       require('../../node_modules/lunr-languages/lunr.stemmer.support.js')(lunr);
-      require('../../node_modules/lunr-languages/lunr.zh')(lunr);
+      require('./lunr.zh')(lunr);
       //@ts-ignore
       global.lunr = lunr;
     }
@@ -97,7 +99,7 @@ module.exports = {
   search: async function(keyword){
     let db = new PouchDB(DB_NAME);
     const result = await db.search({
-      query: "网",
+      query: keyword,
       fields: {
         'name': 1,
       },

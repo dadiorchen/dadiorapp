@@ -9,7 +9,7 @@ import Calculator from "./AppIcon_128x128x32.png";
 import Longman from "./longman.png";
 import Box from "@material-ui/core/Box";
 import Divider from "@material-ui/core/Divider";
-import Icon from "/Applications/Be Focused.app/Contents/Resources/AppIconlite.icns";
+//import Icon from "/Applications/Be Focused.app/Contents/Resources/AppIconlite.icns";
 
 //dev
 if(!window.require){
@@ -17,9 +17,36 @@ if(!window.require){
   window.require= function(){
     return {
       ipcRenderer: {
-        invoke: () => {
-          console.log("mock invoke");
-          return Promise.resolve(1);
+        invoke: async (_: any, text: string) => {
+          console.log("mock invoke:", text);
+          if(text === "1"){
+            return {
+              type: "calculator",
+              result: 2
+            };
+          }else if(text === "l t"){
+            return {
+              type: "openUrl",
+              result: {
+                url: "https://www.ldoceonline.com/dictionary/test",
+              }
+            };
+          }else if(text === "qq"){
+            return {
+              type: "openApp",
+              result: {
+                list: [{
+                  name: "QQ",
+                  exe: "qq",
+                },{
+                  name: "WeChat",
+                  exe: "wechat",
+                }],
+              }
+            };
+          }else{
+            return undefined;
+          }
         }
       }
     };
@@ -99,6 +126,16 @@ const useStyles = makeStyles({
     padding: 10,
     color: GRAY_COLOR,
   },
+  listBox: {
+    flexDirection: "column",
+  },
+  listItemBox: {
+    color: GRAY_COLOR,
+    padding: "10px 20px",
+  },
+  listHighlight: {
+    background: "#155FCF",
+  },
 });
 
 const ipc = window.require("electron").ipcRenderer;
@@ -129,15 +166,36 @@ function App() {
   const [output, setOutput] = React.useState("");
   const classes = useStyles();
   const [mode, setMode] = React.useState("");
-
+//  const [result, setResult] = React.useState<any>(undefined);
+  const [result, setResult] = React.useState<any>(
+            {
+              type: "openApp",
+              result: {
+                list: [{
+                  name: "QQ",
+                  exe: "qq",
+                },{
+                  name: "WeChat",
+                  exe: "wechat",
+                }],
+              }
+            });
+  const [listIndex, setListIndex] = React.useState<number>(0);
   function handleKeyUp(e: any){
+    console.log("handle key:", e.key);
       if(e.key === "Enter"){
         console.log("enter");
-        var match
-        if(input && (match = input.match(/l\s+(.*)/))){
-          console.log("launch longman", match[1]);
-          launchLongman(match[1]);
+        if(result.type === "openUrl"){
+          ipc.invoke("action", "openUrl", result.result.url);
+          //launchLongman(result.result.url);
+        }else if(result.type === "openApp"){
+          ipc.invoke("action", "openApp", result.result.list[listIndex]);
         }
+//        var match
+//        if(input && (match = input.match(/l\s+(.*)/))){
+//          console.log("launch longman", match[1]);
+//          launchLongman(match[1]);
+//        }
       }else if(e.key === "Escape"){
         console.log("escape");
         if(input !== ""){
@@ -148,29 +206,52 @@ function App() {
           console.log("close");
           close();
         }
+      }else if(e.key === "ArrowUp"){
+        if(result?.type === "openApp"){
+          setListIndex(
+            listIndex === 0?
+              result.result.list.length -1
+            :
+              (listIndex - 1) % result.result.list.length);
+        }
+      }else if(e.key === "ArrowDown"){
+        if(result?.type === "openApp"){
+          setListIndex((listIndex + 1) % result.result.list.length);
+        }
       }
   }
 
   function handleChange(e: any){
     console.log("handle...", e.target);
     setInput(e.target.value);
-    cal(e.target.value)
+    ipc.invoke("handleInputChange", e.target.value)
       .then((r: any) => {
-        if(r){
-          console.log("r:", r);
-          setOutput(r + "");
-          setMode("calculator");
-        }else{
-          var match;
-          if(input && (match = input.match(/l\s+(.*)/))){
-            setOutput('');
-            setMode("longman");
-          }else{
-            setOutput('');
-            setMode("");
-          }
-        }
+        setResult(r);
+//        if(r.type === "calculator"){
+//          setOutput(r.result + "");
+//          setMode("calculator");
+//        }else if(r.type === "openUrl"){
+//          setOutput('');
+//          setMode("longman");
+//        }
       });
+//    cal(e.target.value)
+//      .then((r: any) => {
+//        if(r){
+//          console.log("r:", r);
+//          setOutput(r + "");
+//          setMode("calculator");
+//        }else{
+//          var match;
+//          if(input && (match = input.match(/l\s+(.*)/))){
+//            setOutput('');
+//            setMode("longman");
+//          }else{
+//            setOutput('');
+//            setMode("");
+//          }
+//        }
+//      });
   }
 
   React.useEffect(() => {
@@ -212,13 +293,13 @@ function App() {
               value={input} />
           </Grid>
           <Grid item className={classes.searchBox} >
-            {mode === "" &&
+            {!result &&
               <Box/>
             }
-            {mode === "calculator" &&
+            {result?.type === "calculator" &&
               <Avatar variant="rounded" src={Calculator} />
             }
-            {mode === "longman" &&
+            {result?.type === "openUrl" &&
               <Avatar variant="rounded" src={Longman} />
             }
           </Grid>
@@ -230,12 +311,21 @@ function App() {
       <Grid item className={classes.box2} >
         <Grid container className={classes.box3} >
           <Grid item xs={4} >
+            {result?.type === "openApp" &&
+              <Grid container className={classes.listBox} >
+                {result?.result.list.map((app: any, i: number) => 
+                  <Grid item className={`${classes.listItemBox} ${i === listIndex?classes.listHighlight:''}`} >
+                    {app.name}
+                  </Grid>
+                )}
+              </Grid>
+            }
           </Grid>
           <Grid item>
             <Divider className={classes.divider} orientation="vertical" />
           </Grid>
           <Grid item xs={8} >
-            {mode === "calculator" &&
+            {result?.type === "calculator" &&
               <Grid container className={classes.calBox} >
                 <Grid item className={classes.calBoxUp} >
                   <Typography variant="h5" >
@@ -247,7 +337,7 @@ function App() {
                 </Grid>
                 <Grid item className={classes.calBoxDown} >
                   <Typography variant="h4" >
-                    <span>{output}</span>
+                    <span>{result.result}</span>
                   </Typography>
                 </Grid>
               </Grid>

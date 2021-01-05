@@ -7,7 +7,7 @@ const expectR = expectRuntime;
 const fs = require("fs");
 const log = require("loglevel");
 const du = require('du')
-log.setLevel("debug");
+log.setLevel("info");
 
 describe("test", () => {
 
@@ -66,7 +66,7 @@ describe("test", () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
-  describe("search", () => {
+  describe.only("search", () => {
 
     beforeEach(async () => {
       await app.init();
@@ -83,6 +83,24 @@ describe("test", () => {
     it("zh", async () => {
       const found = await app.search("网易");
       expectR(found).lengthOf.least(1);
+      expectR(found).match([{
+        exe: expectR.anything(),
+      }]);
+    });
+
+    it.only("partial", async () => {
+      const found = await app.search("We");
+      expectR(found).lengthOf.least(1);
+      log.info("found:", found);
+      expectR(found).match([{
+        exe: expectR.anything(),
+      }]);
+    });
+
+    it.only("partial", async () => {
+      const found = await app.search("monitor");
+      expectR(found).lengthOf.least(1);
+      log.info("found:", found);
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
@@ -305,7 +323,7 @@ describe("test", () => {
   });
 
 
-  it.only("open app", async () => {
+  it("open app", async () => {
     const shell = require("shelljs");
     const r = await shell.exec("open -a 网易有道词典");
     log.debug("shell:", r);

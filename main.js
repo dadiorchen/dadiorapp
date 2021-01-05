@@ -1,4 +1,7 @@
 const path = require('path')
+const api = require("./src/models/api");
+const log = require("loglevel");
+const appModel = require("./src/models/app");
 
 //auto reload
 try {
@@ -93,6 +96,16 @@ ipcMain.handle("cal", async (e, a) => {
   return;
 });
 
+ipcMain.handle("handleInputChange", async (e, ...args) => {
+  return api.handleInputChange(...args);
+});
+
+ipcMain.handle("action", async (e, ...args) => {
+  const r = await api.action(...args);
+  console.log("ipc close window");
+  closeWindow();
+});
+
 app.whenReady().then(() => {
   console.log("ready");
   createWindow();
@@ -113,7 +126,7 @@ app.on('activate', () => {
   }
 })
 
-app.on('ready', () => {
+app.on('ready', async () => {
   console.log("on ready");
   
   //shortcut
@@ -139,6 +152,8 @@ app.on('ready', () => {
 
   appIcon.setToolTip('Dadiorapp')
   appIcon.setContextMenu(contextMenu)
+
+  await appModel.init();
 
 });
 
