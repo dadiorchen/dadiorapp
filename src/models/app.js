@@ -7,6 +7,8 @@ const DB_NAME = "dadiorapp.db";
 var PouchDB = require("pouchdb");
 PouchDB.plugin(require('pouchdb-quick-search'));
 const isChineseEnabled = true
+const iconutil = require('iconutil');
+const glob = require("glob");
 
 module.exports = {
   getAppInfo: function(plistFile){
@@ -25,13 +27,13 @@ module.exports = {
       throw 500;
     }
   },
-  getAppInfoList: function(){
+  getAppInfoList: async function(){
     const pathAppDir = "/Applications";
     const dirs = fs.readdirSync(pathAppDir);
     log.log("dirs:", dirs);
     let counter = 0;
     const result = [];
-    dirs.forEach(dir => {
+    for(let dir of dirs){
       if(dir.match("^.*\.app$")){
         const path = `${pathAppDir}/${dir}/Contents/Info.plist`;
         log.log("path of app:", path);
@@ -41,6 +43,9 @@ module.exports = {
           expect(one.name).defined();
           expect(one.exe).defined();
           log.log(`open -a "${result.exe}"`);
+          //icon
+          const dataURL = await this.getIcon(`${pathAppDir}/${dir}/Contents/`); 
+          one.icon = dataURL;
           counter++;
           result.push(one);
         }catch(e){
@@ -53,7 +58,7 @@ module.exports = {
       }else{
         log.debug("bad app:", dir);
       }
-    });
+    };
     log.log("sucessed %d, total: %d", counter, dirs.length);
     return result;
   },
@@ -74,7 +79,7 @@ module.exports = {
       global.lunr = lunr;
     }
 
-    const apps = this.getAppInfoList();
+    const apps = await this.getAppInfoList();
     const appDocs = apps.map((a,i) => {
       return {
         _id: i + "",
@@ -147,5 +152,25 @@ module.exports = {
     });
     log.log("find:", find);
     return find;
+  },
+  getIcon: async function(dir){
+    const files = glob.sync(`${dir}/**/*.icns`);
+    const path = files[0];
+    expect(path).match(/.*\.icns/);
+    const bufferMap = await (new Promise((res, _rej) => {
+      iconutil.toIconset(path, function(err, icons) {
+        // icons is an an object where keys are the file names
+        // and the values are Buffers containing PNG files
+        log.trace("err:", err);
+        log.trace("icons:", icons);
+        res(icons);
+      });
+    }));
+    expectRuntime(bufferMap).defined();
+    const buffers =  Object.values(bufferMap);
+    const buffer = buffers.pop();
+    var string = buffer.toString('base64');
+    var dataURL = "data:image/png;base64," + string
+    return dataURL;
   },
 }

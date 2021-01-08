@@ -66,18 +66,18 @@ describe("test", () => {
     expect(result.length).toBeGreaterThan(0);
   });
 
-  describe.only("search", () => {
+  describe("search", () => {
 
     beforeEach(async () => {
       await app.init();
     });
 
-    it("en", async () => {
-      const found = await app.search("WeChat");
-      expectR(found).lengthOf.least(1);
-      expectR(found).match([{
-        exe: expectR.anything(),
-      }]);
+    it.only("en", async () => {
+//      const found = await app.search("WeChat");
+//      expectR(found).lengthOf.least(1);
+//      expectR(found).match([{
+//        exe: expectR.anything(),
+//      }]);
     });
 
     it("zh", async () => {
@@ -88,7 +88,7 @@ describe("test", () => {
       }]);
     });
 
-    it.only("partial", async () => {
+    it("partial", async () => {
       const found = await app.search("We");
       expectR(found).lengthOf.least(1);
       log.info("found:", found);
@@ -97,7 +97,7 @@ describe("test", () => {
       }]);
     });
 
-    it.only("partial", async () => {
+    it("partial", async () => {
       const found = await app.search("monitor");
       expectR(found).lengthOf.least(1);
       log.info("found:", found);
@@ -299,27 +299,10 @@ describe("test", () => {
 
 
   it("icon", async () => {
-    var iconutil = require('iconutil');
-
-    var path = "/Applications/Be Focused.app/Contents/Resources/AppIconlite.icns";
-
-    const bufferMap = await (new Promise((res, rej) => {
-      iconutil.toIconset(path, function(err, icons) {
-        // icons is an an object where keys are the file names
-        // and the values are Buffers containing PNG files
-        console.log("err:", err);
-        console.log("icons:", icons);
-        res(icons);
-      });
-    }));
-    expectRuntime(bufferMap).defined();
-    const buffers =  Object.values(bufferMap);
-    const buffer = buffers.pop();
-    var string = buffer.toString('base64');
-    var dataURL = "data:image/png;base64," + string
+    var path = "/Applications/Be Focused.app/";//Contents/Resources/AppIconlite.icns";
+    const dataURL = await app.getIcon(path);
     console.log(dataURL.slice(0, 200));
     fs.writeFileSync("/Users/deanchen/work/temp/test.png", dataURL);
-
   });
 
 
