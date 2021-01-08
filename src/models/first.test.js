@@ -7,6 +7,8 @@ const expectR = expectRuntime;
 const fs = require("fs");
 const log = require("loglevel");
 const du = require('du')
+var PouchDB = require("pouchdb");
+PouchDB.plugin(require('pouchdb-quick-search'));
 log.setLevel("info");
 
 describe("test", () => {
@@ -61,23 +63,34 @@ describe("test", () => {
     }).toThrow();
   });
 
-  it("scan apps plist", () => {
-    const result = app.getAppInfoList();
+  it.skip("scan apps plist", async () => {
+    const result = await app.getAppInfoList();
     expect(result.length).toBeGreaterThan(0);
   });
 
   describe("search", () => {
+    let db;
 
     beforeEach(async () => {
+      db = new PouchDB(app.DB_NAME);
+      await db.destroy();
+      db = new PouchDB(app.DB_NAME);
       await app.init();
     });
 
+    afterEach(async () => {
+      if(db){
+        await db.destroy();
+      }
+    });
+
+
     it.only("en", async () => {
-//      const found = await app.search("WeChat");
-//      expectR(found).lengthOf.least(1);
-//      expectR(found).match([{
-//        exe: expectR.anything(),
-//      }]);
+      const found = await app.search("WeChat");
+      expectR(found).lengthOf.least(1);
+      expectR(found).match([{
+        exe: expectR.anything(),
+      }]);
     });
 
     it("zh", async () => {
@@ -149,7 +162,7 @@ describe("test", () => {
         global.lunr = lunr;
       }
 
-      const apps = app.getAppInfoList();
+      const apps = await app.getAppInfoList();
       const appDocs = apps.map((a,i) => {
         return {
           _id: i + "",
@@ -181,8 +194,8 @@ describe("test", () => {
     for(let file of files){
       const buffer = fs.readFileSync(file);
       const content = buffer.toString();
-      log.info("content:", content.slice(0, 10));
-      log.info("length: ", content.length);
+      log.trace("content:", content.slice(0, 10));
+      log.trace("length: ", content.length);
     }
 
   });
@@ -192,7 +205,7 @@ describe("test", () => {
     expectRuntime(files).defined();
     for(let f of files){
       let size = await du(f);
-      console.log(`The size of ${f} is: ${size} bytes`)
+      log.trace(`The size of ${f} is: ${size} bytes`)
     }
  
   });
@@ -291,7 +304,7 @@ describe("test", () => {
     }, 1000*60*10);
   });
 
-  it("lunr chinese", () => {
+  it.skip("lunr chinese", () => {
     const found = app.search("网");
     expect(found.length).toBeGreaterThan(0);
   });
@@ -306,7 +319,7 @@ describe("test", () => {
   });
 
 
-  it("open app", async () => {
+  it.skip("open app", async () => {
     const shell = require("shelljs");
     const r = await shell.exec("open -a 网易有道词典");
     log.debug("shell:", r);

@@ -11,6 +11,7 @@ const iconutil = require('iconutil');
 const glob = require("glob");
 
 module.exports = {
+  DB_NAME,
   getAppInfo: function(plistFile){
     const content = fs.readFileSync(plistFile);
     log.log("content:", content.toString().slice(0,100));
@@ -166,11 +167,15 @@ module.exports = {
         res(icons);
       });
     }));
-    expectRuntime(bufferMap).defined();
-    const buffers =  Object.values(bufferMap);
-    const buffer = buffers.pop();
-    var string = buffer.toString('base64');
-    var dataURL = "data:image/png;base64," + string
-    return dataURL;
+    if(!bufferMap){
+      log.warn("can not load icon:", path);
+      return undefined;
+    }else{
+      const buffers =  Object.values(bufferMap);
+      const buffer = buffers.pop();
+      var string = buffer.toString('base64');
+      var dataURL = "data:image/png;base64," + string
+      return dataURL;
+    }
   },
 }

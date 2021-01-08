@@ -101,7 +101,9 @@ ipcMain.handle("cal", async (e, a) => {
 });
 
 ipcMain.handle("handleInputChange", async (e, ...args) => {
-  return api.handleInputChange(...args);
+  const r = await api.handleInputChange(...args);
+  log.debug("input handle:%o", r);
+  return r;
 });
 
 ipcMain.handle("action", async (e, ...args) => {
