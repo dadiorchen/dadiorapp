@@ -2,10 +2,12 @@ const path = require('path')
 const api = require("./src/models/api");
 const log = require("loglevel");
 const appModel = require("./src/models/app");
+const { Notification } = require('electron')
+//const Monitor = require(
 
-log.info("update app...");
-const r = require('update-electron-app')()
-log.debug("retrun from updater:", r);
+//log.info("update app...");
+//const r = require('update-electron-app')()
+//log.debug("retrun from updater:", r);
 
 //auto reload
 try {
@@ -20,6 +22,19 @@ const ENV = process.env.NODE_ENV || "prod";
 
 console.log("init app with env:", ENV);
 
+
+function showNotification (message, callback) {
+  const notification = {
+    title: 'Dadiorapp',
+    body: message,
+  }
+  const resolve = new Notification(notification);
+  resolve.on("close", function(){
+    log.debug("close notification");
+    callback && callback();
+  });
+  resolve.show();
+};
 
 
 function createWindow () {
@@ -102,7 +117,7 @@ ipcMain.handle("cal", async (e, a) => {
 
 ipcMain.handle("handleInputChange", async (e, ...args) => {
   const r = await api.handleInputChange(...args);
-  log.debug("input handle:%o", r);
+  log.debug("input handle:", r);
   return r;
 });
 
@@ -136,7 +151,8 @@ app.on('ready', async () => {
   console.log("on ready");
   
   //shortcut
-  globalShortcut.register('Ctrl+Shift+Alt+D', () => {
+//  globalShortcut.register('Ctrl+Shift+Alt+D', () => {
+  globalShortcut.register('Alt+D', () => {
     console.log("press")
     activeApp();
   });
@@ -160,6 +176,12 @@ app.on('ready', async () => {
   appIcon.setContextMenu(contextMenu)
 
   await appModel.init();
+
+  setTimeout(() => {
+    showNotification("xxxxxxxx", function(){
+      log.warn("closed");
+    });
+  }, 1000);
 
 });
 

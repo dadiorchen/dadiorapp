@@ -7,6 +7,7 @@ const expectR = expectRuntime;
 const fs = require("fs");
 const log = require("loglevel");
 const du = require('du')
+const axios = require("axios");
 var PouchDB = require("pouchdb");
 PouchDB.plugin(require('pouchdb-quick-search'));
 log.setLevel("info");
@@ -85,7 +86,7 @@ describe("test", () => {
     });
 
 
-    it.only("en", async () => {
+    it("en", async () => {
       const found = await app.search("WeChat");
       expectR(found).lengthOf.least(1);
       expectR(found).match([{
@@ -323,6 +324,29 @@ describe("test", () => {
     const shell = require("shelljs");
     const r = await shell.exec("open -a 网易有道词典");
     log.debug("shell:", r);
+  });
+
+});
+
+describe("ping", () => {
+
+  it("", async () => {
+    const res = await axios.get("http://localhost:5984");
+    expectR(res).property("status").eq(200);
+  });
+
+  it.only("", async () => {
+    async function ping(){
+      try{
+        await axios.get("http://localhost:5984");
+      }catch(e){
+        log.warn("e:", e);
+        throw e;
+      }
+    }
+    await expect(async () => {
+      await ping();
+    }).rejects.toThrow(/Network Error/);
   });
 
 });

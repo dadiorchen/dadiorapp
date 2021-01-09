@@ -42,6 +42,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
+    "axios": "^0.21.1",
     "du": "^1.0.0",
     "electron-squirrel-startup": "^1.0.0",
     "expect-runtime": "^0.10.0",
