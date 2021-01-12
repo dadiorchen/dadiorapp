@@ -3,7 +3,7 @@ const api = require("./src/models/api");
 const log = require("loglevel");
 const appModel = require("./src/models/app");
 const { Notification } = require('electron')
-//const Monitor = require(
+const Monitor = require("./src/models/Monitor");
 
 //log.info("update app...");
 //const r = require('update-electron-app')()
@@ -177,11 +177,20 @@ app.on('ready', async () => {
 
 //  await appModel.init();
 
-  setTimeout(() => {
-    showNotification("xxxxxxxx", function(){
+//  setTimeout(() => {
+//    showNotification("xxxxxxxx", function(){
+//      log.warn("closed");
+//    });
+//  }, 1000);
+//
+  const monitor = new Monitor();
+  monitor.onAlert(() => {
+    log.warn("on alert");
+    showNotification("The service is broken!", function(){
       log.warn("closed");
     });
-  }, 1000);
+  });
+  monitor.start();
 
 });
 

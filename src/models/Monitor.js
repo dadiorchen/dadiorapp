@@ -19,21 +19,21 @@ class Monitor{
   start(){
     log.warn("start...");
     this._timer = setInterval(async () => {
-      log.error("a beat");
+      log.warn("a beat");
       try{
-        await axios.get("http://localhost:5984");
+//        await axios.get("http://localhost:5984");
+        await axios.get("http://midinote.me:5984/");
       }catch(e){
         log.error("catch...,", e.message);
-        if(e.message === "Network Error"){
+        if(e.message.match("Network Error") || e.message.match(/ECONNREFUSED/)){
           log.error("in:", this._alertHandler);
           this._alertHandler();
         }else{
-          expect.fail();
           log.warn("unkown error:", e);
         }
       }
-      log.error("a beat end.");
-    }, 1000);
+      log.error("a beat end.", new Date());
+    }, 1000*60*30);
   }
 }
 
