@@ -30,7 +30,7 @@ function showNotification (message, callback) {
   }
   const resolve = new Notification(notification);
   resolve.on("close", function(){
-    log.debug("close notification");
+    log.warn("close notification");
     callback && callback();
   });
   resolve.show();
@@ -175,7 +175,7 @@ app.on('ready', async () => {
   appIcon.setToolTip('Dadiorapp')
   appIcon.setContextMenu(contextMenu)
 
-  await appModel.init();
+//  await appModel.init();
 
   setTimeout(() => {
     showNotification("xxxxxxxx", function(){

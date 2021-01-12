@@ -24,20 +24,23 @@ module.exports = {
         exe: plistObject.CFBundleExecutable,
       }
     }catch(e){
-      log.log("parse plist fail:", e);
+      log.trace("parse plist fail:", e);
       throw 500;
     }
   },
   getAppInfoList: async function(){
     const pathAppDir = "/Applications";
-    const dirs = fs.readdirSync(pathAppDir);
+    const dirsA = fs.readdirSync(pathAppDir);
+    const pathAppDirB = "/Applications/Utilities";
+    const dirsB = fs.readdirSync(pathAppDirB);
+    const dirs = [...dirsA, ...dirsB];
     log.log("dirs:", dirs);
     let counter = 0;
     const result = [];
     for(let dir of dirs){
       if(dir.match("^.*\.app$")){
         const path = `${pathAppDir}/${dir}/Contents/Info.plist`;
-        log.log("path of app:", path);
+        log.info("path of app:", path);
         expect(fs.existsSync(path)).eq(true);
         try{
           const one = this.getAppInfo(path);
@@ -81,6 +84,7 @@ module.exports = {
     }
 
     const apps = await this.getAppInfoList();
+    log.info("got app info");
     const appDocs = apps.map((a,i) => {
       return {
         _id: i + "",
@@ -91,6 +95,7 @@ module.exports = {
     log.debug("doc:", doc);
       await db.put(doc);
     });
+    log.info("put doc");
     const result = await db.search({
       query: "网",
       fields: {
@@ -99,7 +104,8 @@ module.exports = {
       include_docs: true,
       language: isChineseEnabled? 'zh' : undefined,
     });
-    log.warn("result:%o", result);
+    log.info("searched");
+    log.trace("result:%o", result);
     //expectRuntime(result).property("rows").lengthOf.least(1);
   },
   search: async function(keyword){

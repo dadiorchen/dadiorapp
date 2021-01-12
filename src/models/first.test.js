@@ -7,62 +7,11 @@ const expectR = expectRuntime;
 const fs = require("fs");
 const log = require("loglevel");
 const du = require('du')
-const axios = require("axios");
 var PouchDB = require("pouchdb");
 PouchDB.plugin(require('pouchdb-quick-search'));
 log.setLevel("info");
 
 describe("test", () => {
-
-  it.skip("", () => {
-    const os = require('os');
-    const { exec } = require('shelljs');
-
-    const APP_REF = 'com.tnt.Adobe-Zii-2019';//'com.adobe.Photoshop';
-    const isMacOs = os.platform() === 'darwin';
-
-    /**
-     * Helper function to shell out various commands.
-     * @returns {String} The result of the cmd minus the newline character.
-     */
-    function shellOut(cmd) {
-      return exec(cmd, { silent: true }).stdout.replace(/\n$/, '');
-    }
-
-
-    if (isMacOs) {
-
-      const appName = shellOut(`osascript -e 'tell application "Finder" \
-      to get displayed name of application file id "${APP_REF}"'`);
-
-      console.log("app name:", appName);
-
-      if (appName) {
-        const version = shellOut(`osascript -e 'tell application "Finder" \
-        to get version of application file id "${APP_REF}"'`).split(' ')[0];
-
-        console.log(version); // Log the version to console.
-
-        //shellOut(`open -a "${appName}"`); // Launch the application.
-      } else {
-        console.log('Photoshop is not installed');
-      }
-    }
-  });
-
-  it("get display name", () => {
-    const path = "/Applications/WeChat.app/Contents/Info.plist";
-    const result = app.getAppInfo(path);
-    expect(result.name).toBeDefined();
-    expect(result.exe).toBeDefined();
-  });
-
-  it("get display name, special", () => {
-    const path = "/Applications/Keynote.app/Contents/Info.plist";
-    expect(() => {
-      app.getAppInfo(path);
-    }).toThrow();
-  });
 
   it.skip("scan apps plist", async () => {
     const result = await app.getAppInfoList();
@@ -77,13 +26,12 @@ describe("test", () => {
       await db.destroy();
       db = new PouchDB(app.DB_NAME);
       await app.init();
-    });
+    }, 1000*30);
 
     afterEach(async () => {
-      if(db){
-        await db.destroy();
-      }
-    });
+      db = new PouchDB(app.DB_NAME);
+      await db.destroy();
+    }, 1000*30);
 
 
     it("en", async () => {
@@ -92,7 +40,16 @@ describe("test", () => {
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
-    });
+    }, 1000*30);
+
+    it.only("en", async () => {
+      const found = await app.search("monitor");
+      log.info("found:", found);
+      expectR(found).lengthOf.least(1);
+      expectR(found).match([{
+        exe: expectR.anything(),
+      }]);
+    }, 1000*30);
 
     it("zh", async () => {
       const found = await app.search("网易");
@@ -105,7 +62,7 @@ describe("test", () => {
     it("partial", async () => {
       const found = await app.search("We");
       expectR(found).lengthOf.least(1);
-      log.info("found:", found);
+      log.trace("found:", found);
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
@@ -114,7 +71,7 @@ describe("test", () => {
     it("partial", async () => {
       const found = await app.search("monitor");
       expectR(found).lengthOf.least(1);
-      log.info("found:", found);
+      log.trace("found:", found);
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
@@ -200,24 +157,6 @@ describe("test", () => {
     }
 
   });
-
-  it("", async () => {
-    const files = fs.readdirSync(".");//.filter(file => file.match(/package.*/));
-    expectRuntime(files).defined();
-    for(let f of files){
-      let size = await du(f);
-      log.trace(`The size of ${f} is: ${size} bytes`)
-    }
- 
-  });
-
-  it("", () => {
-    var glob = require("glob");
-    const files = glob.sync("/Users/deanchen/work/test/data/**/*.+(md|js)");
-    expectRuntime(files).lengthOf.above(0);
-    log.info("files:", files.length);
-  });
-
 
   describe.skip("PounchDB big data", () => {
     var PouchDB = require("pouchdb");
@@ -328,25 +267,3 @@ describe("test", () => {
 
 });
 
-describe("ping", () => {
-
-  it("", async () => {
-    const res = await axios.get("http://localhost:5984");
-    expectR(res).property("status").eq(200);
-  });
-
-  it.only("", async () => {
-    async function ping(){
-      try{
-        await axios.get("http://localhost:5984");
-      }catch(e){
-        log.warn("e:", e);
-        throw e;
-      }
-    }
-    await expect(async () => {
-      await ping();
-    }).rejects.toThrow(/Network Error/);
-  });
-
-});
