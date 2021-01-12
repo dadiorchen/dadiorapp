@@ -1,7 +1,7 @@
 const fs = require("fs");
 const expectRuntime = require("expect-runtime");
 const expect = expectRuntime;
-const log = require("loglevel");
+//const log = require("loglevel");
 const DB_NAME = "dadiorapp.db";
 //init DB
 var PouchDB = require("pouchdb");
@@ -9,6 +9,8 @@ PouchDB.plugin(require('pouchdb-quick-search'));
 const isChineseEnabled = true
 const iconutil = require('iconutil');
 const glob = require("glob");
+const log = require('electron-log');
+log.trace = () => {};
 
 module.exports = {
   DB_NAME,
@@ -69,13 +71,13 @@ module.exports = {
     log.log("sucessed %d, total: %d", counter, dirs.length);
     return result;
   },
-  init: async function(){
+  init: async function(path){
     //DB
     let db = new PouchDB(DB_NAME);
     log.info("init db, reset the db...");
     //clean
     await db.destroy();
-    db = new PouchDB(DB_NAME);
+    db = new PouchDB(`${path? path+"/":""}${DB_NAME}`);
     log.info("new one");
     if(isChineseEnabled){
       log.warn("load chinese index");

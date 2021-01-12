@@ -44,6 +44,7 @@
     "@material-ui/icons": "^4.11.2",
     "axios": "^0.21.1",
     "du": "^1.0.0",
+    "electron-log": "^4.3.1",
     "electron-squirrel-startup": "^1.0.0",
     "expect-runtime": "^0.10.0",
     "glob": "^7.1.6",
