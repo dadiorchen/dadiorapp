@@ -175,7 +175,7 @@ app.on('ready', async () => {
   appIcon.setToolTip('Dadiorapp')
   appIcon.setContextMenu(contextMenu)
 
-//  await appModel.init();
+  await appModel.init();
 
 //  setTimeout(() => {
 //    showNotification("xxxxxxxx", function(){
@@ -191,6 +191,13 @@ app.on('ready', async () => {
     });
   });
   monitor.start();
+
+  showNotification("I am with you");
+  setInterval(() => {
+    showNotification("I am with you", function(){
+      log.warn("closed 2");
+    });
+  }, 1000*60*60*5);
 
 });
 

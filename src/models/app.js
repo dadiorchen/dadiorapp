@@ -41,7 +41,10 @@ module.exports = {
       if(dir.match("^.*\.app$")){
         const path = `${pathAppDir}/${dir}/Contents/Info.plist`;
         log.info("path of app:", path);
-        expect(fs.existsSync(path)).eq(true);
+        if(!fs.existsSync(path)){
+          log.warn("can not find info list file:", path);
+          continue;
+        }
         try{
           const one = this.getAppInfo(path);
           expect(one.name).defined();
@@ -92,7 +95,7 @@ module.exports = {
       }
     });
     appDocs.forEach(async doc => {
-    log.debug("doc:", doc);
+    log.trace("doc:", doc);
       await db.put(doc);
     });
     log.info("put doc");
@@ -136,7 +139,7 @@ module.exports = {
       this.use(lunr[language]);
       this.field('name')
       appDocs.forEach(doc => {
-      log.debug("doc:", doc);
+      log.trace("doc:", doc);
         this.add(doc);
       });
     })

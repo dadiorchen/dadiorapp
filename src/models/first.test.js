@@ -44,7 +44,7 @@ describe("test", () => {
 
     it.only("en", async () => {
       const found = await app.search("monitor");
-      log.info("found:", found);
+      log.trace("found:", found);
       expectR(found).lengthOf.least(1);
       expectR(found).match([{
         exe: expectR.anything(),
