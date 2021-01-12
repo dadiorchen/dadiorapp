@@ -1,14 +1,19 @@
 const fs = require("fs");
 const expectRuntime = require("expect-runtime");
 const expect = expectRuntime;
-const log = require("loglevel");
+//const log = require("loglevel");
 const DB_NAME = "dadiorapp.db";
 //init DB
 var PouchDB = require("pouchdb");
 PouchDB.plugin(require('pouchdb-quick-search'));
 const isChineseEnabled = true
+const iconutil = require('iconutil');
+const glob = require("glob");
+const log = require('electron-log');
+log.trace = () => {};
 
 module.exports = {
+  DB_NAME,
   getAppInfo: function(plistFile){
     const content = fs.readFileSync(plistFile);
     log.log("content:", content.toString().slice(0,100));
@@ -21,26 +26,35 @@ module.exports = {
         exe: plistObject.CFBundleExecutable,
       }
     }catch(e){
-      log.log("parse plist fail:", e);
+      log.trace("parse plist fail:", e);
       throw 500;
     }
   },
-  getAppInfoList: function(){
+  getAppInfoList: async function(){
     const pathAppDir = "/Applications";
-    const dirs = fs.readdirSync(pathAppDir);
+    const dirsA = fs.readdirSync(pathAppDir);
+    const pathAppDirB = "/Applications/Utilities";
+    const dirsB = fs.readdirSync(pathAppDirB);
+    const dirs = [...dirsA, ...dirsB];
     log.log("dirs:", dirs);
     let counter = 0;
     const result = [];
-    dirs.forEach(dir => {
+    for(let dir of dirs){
       if(dir.match("^.*\.app$")){
         const path = `${pathAppDir}/${dir}/Contents/Info.plist`;
-        log.log("path of app:", path);
-        expect(fs.existsSync(path)).eq(true);
+        log.info("path of app:", path);
+        if(!fs.existsSync(path)){
+          log.warn("can not find info list file:", path);
+          continue;
+        }
         try{
           const one = this.getAppInfo(path);
           expect(one.name).defined();
           expect(one.exe).defined();
           log.log(`open -a "${result.exe}"`);
+          //icon
+          const dataURL = await this.getIcon(`${pathAppDir}/${dir}/Contents/`); 
+          one.icon = dataURL;
           counter++;
           result.push(one);
         }catch(e){
@@ -53,17 +67,17 @@ module.exports = {
       }else{
         log.debug("bad app:", dir);
       }
-    });
+    };
     log.log("sucessed %d, total: %d", counter, dirs.length);
     return result;
   },
-  init: async function(){
+  init: async function(path){
     //DB
     let db = new PouchDB(DB_NAME);
     log.info("init db, reset the db...");
     //clean
     await db.destroy();
-    db = new PouchDB(DB_NAME);
+    db = new PouchDB(`${path? path+"/":""}${DB_NAME}`);
     log.info("new one");
     if(isChineseEnabled){
       log.warn("load chinese index");
@@ -74,7 +88,8 @@ module.exports = {
       global.lunr = lunr;
     }
 
-    const apps = this.getAppInfoList();
+    const apps = await this.getAppInfoList();
+    log.info("got app info");
     const appDocs = apps.map((a,i) => {
       return {
         _id: i + "",
@@ -82,9 +97,10 @@ module.exports = {
       }
     });
     appDocs.forEach(async doc => {
-    log.debug("doc:", doc);
+    log.trace("doc:", doc);
       await db.put(doc);
     });
+    log.info("put doc");
     const result = await db.search({
       query: "网",
       fields: {
@@ -93,7 +109,8 @@ module.exports = {
       include_docs: true,
       language: isChineseEnabled? 'zh' : undefined,
     });
-    log.warn("result:%o", result);
+    log.info("searched");
+    log.trace("result:%o", result);
     //expectRuntime(result).property("rows").lengthOf.least(1);
   },
   search: async function(keyword){
@@ -124,7 +141,7 @@ module.exports = {
       this.use(lunr[language]);
       this.field('name')
       appDocs.forEach(doc => {
-      log.debug("doc:", doc);
+      log.trace("doc:", doc);
         this.add(doc);
       });
     })
@@ -147,5 +164,29 @@ module.exports = {
     });
     log.log("find:", find);
     return find;
+  },
+  getIcon: async function(dir){
+    const files = glob.sync(`${dir}/**/*.icns`);
+    const path = files[0];
+    expect(path).match(/.*\.icns/);
+    const bufferMap = await (new Promise((res, _rej) => {
+      iconutil.toIconset(path, function(err, icons) {
+        // icons is an an object where keys are the file names
+        // and the values are Buffers containing PNG files
+        log.trace("err:", err);
+        log.trace("icons:", icons);
+        res(icons);
+      });
+    }));
+    if(!bufferMap){
+      log.warn("can not load icon:", path);
+      return undefined;
+    }else{
+      const buffers =  Object.values(bufferMap);
+      const buffer = buffers.pop();
+      var string = buffer.toString('base64');
+      var dataURL = "data:image/png;base64," + string
+      return dataURL;
+    }
   },
 }

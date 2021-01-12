@@ -7,70 +7,32 @@ const expectR = expectRuntime;
 const fs = require("fs");
 const log = require("loglevel");
 const du = require('du')
+var PouchDB = require("pouchdb");
+PouchDB.plugin(require('pouchdb-quick-search'));
 log.setLevel("info");
 
 describe("test", () => {
 
-  it.skip("", () => {
-    const os = require('os');
-    const { exec } = require('shelljs');
-
-    const APP_REF = 'com.tnt.Adobe-Zii-2019';//'com.adobe.Photoshop';
-    const isMacOs = os.platform() === 'darwin';
-
-    /**
-     * Helper function to shell out various commands.
-     * @returns {String} The result of the cmd minus the newline character.
-     */
-    function shellOut(cmd) {
-      return exec(cmd, { silent: true }).stdout.replace(/\n$/, '');
-    }
-
-
-    if (isMacOs) {
-
-      const appName = shellOut(`osascript -e 'tell application "Finder" \
-      to get displayed name of application file id "${APP_REF}"'`);
-
-      console.log("app name:", appName);
-
-      if (appName) {
-        const version = shellOut(`osascript -e 'tell application "Finder" \
-        to get version of application file id "${APP_REF}"'`).split(' ')[0];
-
-        console.log(version); // Log the version to console.
-
-        //shellOut(`open -a "${appName}"`); // Launch the application.
-      } else {
-        console.log('Photoshop is not installed');
-      }
-    }
-  });
-
-  it("get display name", () => {
-    const path = "/Applications/WeChat.app/Contents/Info.plist";
-    const result = app.getAppInfo(path);
-    expect(result.name).toBeDefined();
-    expect(result.exe).toBeDefined();
-  });
-
-  it("get display name, special", () => {
-    const path = "/Applications/Keynote.app/Contents/Info.plist";
-    expect(() => {
-      app.getAppInfo(path);
-    }).toThrow();
-  });
-
-  it("scan apps plist", () => {
-    const result = app.getAppInfoList();
+  it.skip("scan apps plist", async () => {
+    const result = await app.getAppInfoList();
     expect(result.length).toBeGreaterThan(0);
   });
 
-  describe.only("search", () => {
+  describe("search", () => {
+    let db;
 
     beforeEach(async () => {
+      db = new PouchDB(app.DB_NAME);
+      await db.destroy();
+      db = new PouchDB(app.DB_NAME);
       await app.init();
-    });
+    }, 1000*30);
+
+    afterEach(async () => {
+      db = new PouchDB(app.DB_NAME);
+      await db.destroy();
+    }, 1000*30);
+
 
     it("en", async () => {
       const found = await app.search("WeChat");
@@ -78,7 +40,16 @@ describe("test", () => {
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
-    });
+    }, 1000*30);
+
+    it.only("en", async () => {
+      const found = await app.search("monitor");
+      log.trace("found:", found);
+      expectR(found).lengthOf.least(1);
+      expectR(found).match([{
+        exe: expectR.anything(),
+      }]);
+    }, 1000*30);
 
     it("zh", async () => {
       const found = await app.search("网易");
@@ -88,19 +59,19 @@ describe("test", () => {
       }]);
     });
 
-    it.only("partial", async () => {
+    it("partial", async () => {
       const found = await app.search("We");
       expectR(found).lengthOf.least(1);
-      log.info("found:", found);
+      log.trace("found:", found);
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
     });
 
-    it.only("partial", async () => {
+    it("partial", async () => {
       const found = await app.search("monitor");
       expectR(found).lengthOf.least(1);
-      log.info("found:", found);
+      log.trace("found:", found);
       expectR(found).match([{
         exe: expectR.anything(),
       }]);
@@ -149,7 +120,7 @@ describe("test", () => {
         global.lunr = lunr;
       }
 
-      const apps = app.getAppInfoList();
+      const apps = await app.getAppInfoList();
       const appDocs = apps.map((a,i) => {
         return {
           _id: i + "",
@@ -181,29 +152,11 @@ describe("test", () => {
     for(let file of files){
       const buffer = fs.readFileSync(file);
       const content = buffer.toString();
-      log.info("content:", content.slice(0, 10));
-      log.info("length: ", content.length);
+      log.trace("content:", content.slice(0, 10));
+      log.trace("length: ", content.length);
     }
 
   });
-
-  it("", async () => {
-    const files = fs.readdirSync(".");//.filter(file => file.match(/package.*/));
-    expectRuntime(files).defined();
-    for(let f of files){
-      let size = await du(f);
-      console.log(`The size of ${f} is: ${size} bytes`)
-    }
- 
-  });
-
-  it("", () => {
-    var glob = require("glob");
-    const files = glob.sync("/Users/deanchen/work/test/data/**/*.+(md|js)");
-    expectRuntime(files).lengthOf.above(0);
-    log.info("files:", files.length);
-  });
-
 
   describe.skip("PounchDB big data", () => {
     var PouchDB = require("pouchdb");
@@ -291,7 +244,7 @@ describe("test", () => {
     }, 1000*60*10);
   });
 
-  it("lunr chinese", () => {
+  it.skip("lunr chinese", () => {
     const found = app.search("网");
     expect(found.length).toBeGreaterThan(0);
   });
@@ -299,34 +252,18 @@ describe("test", () => {
 
 
   it("icon", async () => {
-    var iconutil = require('iconutil');
-
-    var path = "/Applications/Be Focused.app/Contents/Resources/AppIconlite.icns";
-
-    const bufferMap = await (new Promise((res, rej) => {
-      iconutil.toIconset(path, function(err, icons) {
-        // icons is an an object where keys are the file names
-        // and the values are Buffers containing PNG files
-        console.log("err:", err);
-        console.log("icons:", icons);
-        res(icons);
-      });
-    }));
-    expectRuntime(bufferMap).defined();
-    const buffers =  Object.values(bufferMap);
-    const buffer = buffers.pop();
-    var string = buffer.toString('base64');
-    var dataURL = "data:image/png;base64," + string
+    var path = "/Applications/Be Focused.app/";//Contents/Resources/AppIconlite.icns";
+    const dataURL = await app.getIcon(path);
     console.log(dataURL.slice(0, 200));
     fs.writeFileSync("/Users/deanchen/work/temp/test.png", dataURL);
-
   });
 
 
-  it("open app", async () => {
+  it.skip("open app", async () => {
     const shell = require("shelljs");
     const r = await shell.exec("open -a 网易有道词典");
     log.debug("shell:", r);
   });
 
 });
+

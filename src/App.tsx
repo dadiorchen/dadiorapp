@@ -302,6 +302,9 @@ function App() {
             {result?.type === "openUrl" &&
               <Avatar variant="rounded" src={Longman} />
             }
+            {result?.type === "openApp" && result?.result?.list && result.result.list[listIndex]?.icon &&
+              <Avatar variant="rounded" src={result.result.list[listIndex].icon} />
+            }
           </Grid>
         </Grid>
       </Grid>
