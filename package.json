@@ -78,7 +78,20 @@
   },
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "dir": "/Users/deanchen/work/dadiorchen",
+        "osxSign": {
+          "identity": "Apple Development: zheng chen (XES6N5ER5X)",
+          "hardened-runtime": true,
+          "entitlements": "entitlements.plist",
+          "entitlements-inherit": "entitlements.plist",
+          "signature-flags": "library"
+        },
+        "osxNotarize": {
+          "appleId": "237769247@qq.com",
+          "appleIdPassword": "gobu-nebk-nqpp-gaob"
+        }
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",

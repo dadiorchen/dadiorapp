@@ -7,9 +7,9 @@ const { Notification } = require('electron')
 const Monitor = require("./src/models/Monitor");
 log.trace = () => {};
 
-//log.info("update app...");
-//const r = require('update-electron-app')()
-//log.debug("retrun from updater:", r);
+log.info("update app...");
+const r = require('update-electron-app')()
+log.debug("retrun from updater:", r);
 
 //auto reload
 try {
@@ -177,7 +177,7 @@ app.on('ready', async () => {
   appIcon.setToolTip('Dadiorapp')
   appIcon.setContextMenu(contextMenu)
 
-  const appDataDirectory = app.getPath('appData');
+  const appDataDirectory = app.getPath('userData');
   let dbFilePath = appDataDirectory + '/data/';
   if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
     dbFilePath = './data/';
