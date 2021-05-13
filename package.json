@@ -79,9 +79,9 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "dir": "/Users/deanchen/work/dadiorchen",
+        "dir2": "/Users/deanchen/work/dadiorapp",
         "osxSign": {
-          "identity": "Apple Development: zheng chen (XES6N5ER5X)",
+          "identity": "Developer ID Application: zheng chen (6949CCB84V)",
           "hardened-runtime": true,
           "entitlements": "entitlements.plist",
           "entitlements-inherit": "entitlements.plist",
@@ -89,7 +89,7 @@
         },
         "osxNotarize": {
           "appleId": "237769247@qq.com",
-          "appleIdPassword": "gobu-nebk-nqpp-gaob"
+          "appleIdPassword": "tbdk-hrkk-pdqz-kxii"
         }
       },
       "makers": [
