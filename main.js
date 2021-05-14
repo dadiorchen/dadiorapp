@@ -8,7 +8,11 @@ const Monitor = require("./src/models/Monitor");
 log.trace = () => {};
 
 log.info("update app...");
-const r = require('update-electron-app')()
+const r = require('update-electron-app')({
+  repo: 'dadiorchen/dadiorapp',
+  updateInterval: '5 minutes',
+  logger: log,
+})
 log.debug("retrun from updater:", r);
 
 //auto reload
@@ -168,7 +172,7 @@ app.on('ready', async () => {
   app.dock.hide();
 
   const contextMenu = Menu.buildFromTemplate([{
-    label: 'Open Dadiorapp v0.2.1',
+    label: 'Open Dadiorapp v1.0.2',
     click: () => {
       activeApp()
     }
