@@ -1,5 +1,5 @@
 const expect = require("expect-runtime");
-const log = require("loglevel");
+const log = require('electron-log');
 const app = require("./app");
 log.setLevel("debug");
 

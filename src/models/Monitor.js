@@ -1,6 +1,6 @@
 const axios = require("axios");
 const expect = require("expect-runtime");
-const log = require("loglevel");
+const log = require('electron-log');
 
 class Monitor{
 

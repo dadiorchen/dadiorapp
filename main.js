@@ -22,11 +22,11 @@ try {
 
 const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('electron')
 
-console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+log.log("process.env.NODE_ENV:", process.env.NODE_ENV);
 
 const ENV = process.env.NODE_ENV || "prod";
 
-console.log("init app with env:", ENV);
+log.log("init app with env:", ENV);
 
 
 function showNotification (message, callback) {
@@ -44,7 +44,7 @@ function showNotification (message, callback) {
 
 
 function createWindow () {
-  console.log("create win");
+  log.log("create win");
   const win = new BrowserWindow({
     width: 682,
     height: 432,
@@ -54,12 +54,12 @@ function createWindow () {
     frame: false,
   })
 
-  console.log("created window:", win.id);
+  log.log("created window:", win.id);
 
 //  win.on('show', () => {
-//    console.log("on show");
+//    log.log("on show");
 //    setTimeout(() => {
-//      console.log("win focus");
+//      log.log("win focus");
 //      win.focus();
 //    }, 300);
 //  });
@@ -78,12 +78,12 @@ function createWindow () {
 
 function activeApp(){
   if (BrowserWindow.getAllWindows().length === 0) {
-    console.log("no windows, create one");
+    log.log("no windows, create one");
     createWindow()
   }else{
-    console.log("active existed window");
+    log.log("active existed window");
     BrowserWindow.getAllWindows().forEach(win => {
-      console.log("show window:", win.id);
+      log.log("show window:", win.id);
       win.show();
     });
   }
@@ -91,32 +91,32 @@ function activeApp(){
 
 function closeWindow(){
   if (BrowserWindow.getAllWindows().length === 0) {
-    console.log("no windows");
+    log.log("no windows");
   }else{
     BrowserWindow.getAllWindows().forEach(win => {
-      console.log("close window:", win.id);
+      log.log("close window:", win.id);
       win.hide();
     });
   }
 }
 
 ipcMain.on("close-window", e => {
-  console.log("ipc close window");
+  log.log("ipc close window");
   closeWindow();
 });
 
 ipcMain.handle("cal", async (e, a) => {
-  console.log("cal:", e, a);
+  log.log("cal:", e, a);
   //try to calculate
   try{
     const result = eval(a);
     const calResult = parseFloat(result);
     if(calResult){
-      console.log("cal:", calResult);
+      log.log("cal:", calResult);
       return calResult
     }
   }catch(e){
-    console.log("fail:", e);
+    log.log("fail:", e);
   }
   return;
 });
@@ -129,12 +129,12 @@ ipcMain.handle("handleInputChange", async (e, ...args) => {
 
 ipcMain.handle("action", async (e, ...args) => {
   const r = await api.action(...args);
-  console.log("ipc close window");
+  log.log("ipc close window");
   closeWindow();
 });
 
 app.whenReady().then(() => {
-  console.log("ready");
+  log.log("ready");
   createWindow();
 })
 
@@ -146,20 +146,20 @@ app.whenReady().then(() => {
 //
 
 app.on('activate', () => {
-  console.log("on active");
+  log.log("on active");
   if (BrowserWindow.getAllWindows().length === 0) {
-    console.log("create in active");
+    log.log("create in active");
     createWindow()
   }
 })
 
 app.on('ready', async () => {
-  console.log("on ready");
+  log.log("on ready");
   
   //shortcut
 //  globalShortcut.register('Ctrl+Shift+Alt+D', () => {
   globalShortcut.register('Alt+D', () => {
-    console.log("press")
+    log.log("press")
     activeApp();
   });
 
