@@ -1,7 +1,7 @@
 const expect = require("expect-runtime");
 const log = require('electron-log');
 const app = require("./app");
-log.setLevel("debug");
+//log.setLevel("debug");
 
 /*
  * The api to handle input change from UI
