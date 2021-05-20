@@ -172,7 +172,7 @@ app.on('ready', async () => {
   app.dock.hide();
 
   const contextMenu = Menu.buildFromTemplate([{
-    label: 'Open Dadiorapp v1.0.2',
+    label: 'Open Dadiorapp v1.0.5',
     click: () => {
       activeApp()
     }
