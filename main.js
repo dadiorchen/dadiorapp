@@ -5,6 +5,7 @@ const log = require('electron-log');
 const appModel = require("./src/models/app");
 const { Notification } = require('electron')
 const Monitor = require("./src/models/Monitor");
+const fs = require("fs");
 log.trace = () => {};
 
 log.info("update app...");
@@ -23,6 +24,21 @@ try {
 const { ipcMain, app, BrowserWindow, globalShortcut, Menu, Tray} = require('electron')
 
 log.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+
+log.log("path home:", app.getPath("home"));
+log.log("path appData:", app.getPath("appData"));
+log.log("path userData:", app.getPath("userData"));
+log.log("path cache:", app.getPath("cache"));
+log.log("path temp:", app.getPath("temp"));
+log.log("path exe:", app.getPath("exe"));
+log.log("path module:", app.getPath("module"));
+log.log("path desktop:", app.getPath("desktop"));
+log.log("path documents:", app.getPath("documents"));
+log.log("path downloads:", app.getPath("downloads"));
+log.log("path music:", app.getPath("music"));
+log.log("path pictures:", app.getPath("pictures"));
+log.log("path videos:", app.getPath("videos"));
+log.log("path logs:", app.getPath("logs"));
 
 const ENV = process.env.NODE_ENV || "prod";
 
@@ -184,9 +200,14 @@ app.on('ready', async () => {
   const appDataDirectory = app.getPath('userData');
   let dbFilePath = appDataDirectory + '/data/';
   if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'dev') {
-    dbFilePath = './data/';
+    dbFilePath = path.join(__dirname, 'data');
+    log.log("is dev mode, use current path");
   }
   log.info('NODE_ENV:%s, dbFilePath:%s', process.env.NODE_ENV, dbFilePath);
+  if (!fs.existsSync(dbFilePath)){
+    log.log("The path don't exist, create it");
+    fs.mkdirSync(dbFilePath);
+  }
   await appModel.init(dbFilePath);
 
 //  setTimeout(() => {
