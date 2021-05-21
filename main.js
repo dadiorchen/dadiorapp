@@ -6,6 +6,7 @@ const appModel = require("./src/models/app");
 const { Notification } = require('electron')
 const Monitor = require("./src/models/Monitor");
 const fs = require("fs");
+const package = require("./package.json");
 log.trace = () => {};
 
 log.info("update app...");
@@ -188,7 +189,7 @@ app.on('ready', async () => {
   app.dock.hide();
 
   const contextMenu = Menu.buildFromTemplate([{
-    label: 'Open Dadiorapp v1.0.6',
+    label: `Open Dadiorapp ${package.version}`,
     click: () => {
       activeApp()
     }
