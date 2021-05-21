@@ -26,7 +26,7 @@ module.exports = {
         name: plistObject.CFBundleDisplayName || plistObject.CFBundleName,
         exe: plistObject.CFBundleExecutable,
       }
-      if(!one.name || !one.exe){
+      if(!result.name || !result.exe){
         console.error("bad app:", one, "path:", plistObject);
         throw new Error("bad app");
       }
