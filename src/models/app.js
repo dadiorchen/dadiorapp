@@ -22,10 +22,15 @@ module.exports = {
     try{
       const plistObject = plist.parse(content.toString());
       //log.log("parsed plist:", plistObject);
-      return {
+      const result = {
         name: plistObject.CFBundleDisplayName || plistObject.CFBundleName,
         exe: plistObject.CFBundleExecutable,
       }
+      if(!one.name || !one.exe){
+        console.error("bad app:", one, "path:", plistObject);
+        throw new Error("bad app");
+      }
+      return result;
     }catch(e){
       log.trace("parse plist fail:", e);
       throw 500;
@@ -33,16 +38,18 @@ module.exports = {
   },
   getAppInfoList: async function(){
     const pathAppDir = "/Applications";
-    const dirsA = fs.readdirSync(pathAppDir);
+    const dirsA = fs.readdirSync(pathAppDir).map(d => `${pathAppDir}/${d}`);
     const pathAppDirB = "/Applications/Utilities";
-    const dirsB = fs.readdirSync(pathAppDirB);
-    const dirs = [...dirsA, ...dirsB];
+    const dirsB = fs.readdirSync(pathAppDirB).map(d => `${pathAppDirB}/${d}`);
+    const pathAppDirC = "/System/Applications";
+    const dirsC = fs.readdirSync(pathAppDirC).map(d => `${pathAppDirC}/${d}`);
+    const dirs = [...dirsA, ...dirsB, ...dirsC];
     log.log("dirs:", dirs);
     let counter = 0;
     const result = [];
     for(let dir of dirs){
       if(dir.match("^.*\.app$")){
-        const path = `${pathAppDir}/${dir}/Contents/Info.plist`;
+        const path = `${dir}/Contents/Info.plist`;
         log.info("path of app:", path);
         if(!fs.existsSync(path)){
           log.warn("can not find info list file:", path);
@@ -50,11 +57,9 @@ module.exports = {
         }
         try{
           const one = this.getAppInfo(path);
-          expect(one.name).defined();
-          expect(one.exe).defined();
           log.log(`open -a "${result.exe}"`);
           //icon
-          const dataURL = await this.getIcon(`${pathAppDir}/${dir}/Contents/`); 
+          const dataURL = await this.getIcon(`${dir}/Contents/`); 
           one.icon = dataURL;
           counter++;
           result.push(one);
