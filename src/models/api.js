@@ -45,14 +45,29 @@ module.exports = {
     }
   },
   action: async function(type, opt){
-    console.info("action:", type, opt);
-    const shell = require("shelljs");
-    shell.config.execPath = String(shell.which('node'))
-    if(type === "openUrl"){
-      const r = await shell.exec(`open ${opt}`);
-    }else if(type === "openApp"){
-      const r = await shell.exec(`open -a "${opt.exe}"`);
+//    console.info("action:", type, opt);
+//    const shell = require("shelljs");
+//    shell.config.execPath = String(shell.which('node'))
+//    if(type === "openUrl"){
+//      const r = await shell.exec(`open ${opt}`);
+//    }else if(type === "openApp"){
+//      const r = await shell.exec(`open -a "${opt.exe}"`);
+//    }
+    log.info("action:",type, opt);
+    async function exe(command){
+      const {execSync} = require("child_process");
+      try{
+        const result = execSync(command).toString();
+      }catch(e){
+        log.error("get error when exe command:", e);
+      }
     }
+    if(type === "openUrl"){
+      const r = await exe(`open ${opt}`);
+    }else if(type === "openApp"){
+      const r = await exe(`open -a "${opt.exe}"`);
+    }
+    
     
   },
 }
