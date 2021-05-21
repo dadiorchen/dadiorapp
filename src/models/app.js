@@ -79,11 +79,12 @@ module.exports = {
   },
   init: async function(path){
     //DB
-    this.db = new PouchDB(DB_NAME);
+    const realPath = `${path? path+"/":""}${DB_NAME}`;
+    this.db = new PouchDB(realPath);
     log.info("init db, reset the db...");
     //clean
     await this.db.destroy();
-    this.db = new PouchDB(`${path? path+"/":""}${DB_NAME}`);
+    this.db = new PouchDB(realPath);
     log.info("new one");
     if(isChineseEnabled){
       log.warn("load chinese index");
