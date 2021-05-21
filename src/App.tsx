@@ -62,6 +62,7 @@ const useStyles = makeStyles({
   root: {
     background: BACKGROUND_COLOR,
     height: "100vh",
+    flexWrap: "nowrap",
   },
   headBox:{
     justifyContent: "space-between",
