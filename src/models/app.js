@@ -110,7 +110,7 @@ module.exports = {
       language: isChineseEnabled? 'zh' : undefined,
     });
     log.info("searched");
-    log.trace("result:%o", result);
+    log.info("result:%o", result);
     //expectRuntime(result).property("rows").lengthOf.least(1);
   },
   search: async function(keyword){

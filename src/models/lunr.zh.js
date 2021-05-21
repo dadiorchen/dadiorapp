@@ -77,6 +77,10 @@
           //const pattern = new RegExp(/([A-zÀ-ÿ-]+|[0-9._]+|.|!|\?|'|"|:|;|,|-)/i);
           //this tokenizer split every char, for english search which can match any letter user input
           const pattern = '';
+          if(!obj){
+            console.warn("Wrong obj:", obj);
+            return [];
+          }
           const results = obj.split(pattern).filter(e => e !== '' && e !== ' ');
             return results;
         };

@@ -45,7 +45,9 @@ describe("To test the pouchdb behavior", () => {
     {
       const result = await db.search({
         query: "we",
-        fields: ['name'],
+      fields: {
+        'name': 1,
+      },
         include_docs: true,
         language: 'zh',
       });
