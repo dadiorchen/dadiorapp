@@ -14,6 +14,7 @@ log.trace = () => {};
 
 module.exports = {
   DB_NAME,
+  db: undefined,
   getAppInfo: function(plistFile){
     const content = fs.readFileSync(plistFile);
     log.log("content:", content.toString().slice(0,100));
@@ -73,11 +74,11 @@ module.exports = {
   },
   init: async function(path){
     //DB
-    let db = new PouchDB(DB_NAME);
+    this.db = new PouchDB(DB_NAME);
     log.info("init db, reset the db...");
     //clean
-    await db.destroy();
-    db = new PouchDB(`${path? path+"/":""}${DB_NAME}`);
+    await this.db.destroy();
+    this.db = new PouchDB(`${path? path+"/":""}${DB_NAME}`);
     log.info("new one");
     if(isChineseEnabled){
       log.warn("load chinese index");
@@ -98,10 +99,10 @@ module.exports = {
     });
     appDocs.forEach(async doc => {
     log.trace("doc:", doc);
-      await db.put(doc);
+      await this.db.put(doc);
     });
     log.info("put doc");
-    const result = await db.search({
+    const result = await this.db.search({
       query: "网",
       fields: {
         'name': 1,
@@ -114,8 +115,7 @@ module.exports = {
     //expectRuntime(result).property("rows").lengthOf.least(1);
   },
   search: async function(keyword){
-    let db = new PouchDB(DB_NAME);
-    const result = await db.search({
+    const result = await this.db.search({
       query: keyword,
       fields: {
         'name': 1,
