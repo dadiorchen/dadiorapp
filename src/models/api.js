@@ -45,12 +45,13 @@ module.exports = {
     }
   },
   action: async function(type, opt){
+    console.info("action:", type, opt);
     const shell = require("shelljs");
     shell.config.execPath = String(shell.which('node'))
     if(type === "openUrl"){
       const r = await shell.exec(`open ${opt}`);
     }else if(type === "openApp"){
-      const r = await shell.exec(`open -a ${opt.exe}`);
+      const r = await shell.exec(`open -a "${opt.exe}"`);
     }
     
   },
