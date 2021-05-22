@@ -175,7 +175,8 @@ app.on('ready', async () => {
   
   //shortcut
 //  globalShortcut.register('Ctrl+Shift+Alt+D', () => {
-  globalShortcut.register('Alt+D', () => {
+//  globalShortcut.register('Alt+D', () => {
+  globalShortcut.register('Option+Space', () => {
     log.log("press")
     activeApp();
   });
