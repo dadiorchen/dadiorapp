@@ -97,6 +97,12 @@ module.exports = {
 
     const apps = await this.getAppInfoList();
     log.info("got app info");
+
+    //manually add some item
+    apps.push({
+      name: "Activity Monitor",
+      exe: "Activity Monitor",
+    });
     const appDocs = apps.map((a,i) => {
       return {
         _id: i + "",
