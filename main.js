@@ -218,21 +218,6 @@ app.on('ready', async () => {
 //    });
 //  }, 1000);
 //
-  const monitor = new Monitor();
-  monitor.onAlert(() => {
-    log.warn("on alert");
-    showNotification("The service is broken!", function(){
-      log.warn("closed");
-    });
-  });
-  monitor.start();
-
-  showNotification("I am with you");
-  setInterval(() => {
-    showNotification("I am with you", function(){
-      log.warn("closed 2");
-    });
-  }, 1000*60*60*5);
 
 });
 
